@@ -66,6 +66,9 @@ app.post("/validate", (req, res) => {
             });
         });
     }
+    res.json(results);
+});
+
 
     // Validation 2: AlphaCtrlSumCheck (GrpHdr CtrlSum === total of all InstdAmt)
 if (validations.includes("AlphaCtrlSumCheck")) {
@@ -162,8 +165,6 @@ if (validations.includes("AlphaCtrlSumCheck")) {
   
   
 
-    res.json(results);
-});
 
 
 // Start server

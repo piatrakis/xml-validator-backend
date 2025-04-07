@@ -117,40 +117,43 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       "InitgPty Issr": init?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Issr === "Alpha",
       "ChrgBr": pmtInf?.ChrgBr === "SLEV",
     };
+  }
 
-    
-    if (validations.includes("AlphaEndToEndIdCheck")) {
-        results["AlphaEndToEndIdCheck"] = [];
-      
-        const doc = jsonData.Document?.CstmrCdtTrfInitn;
-        const msgId = doc?.GrpHdr?.MsgId || "";
-        const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
-      
-        const txs = Array.isArray(pmtInf?.CdtTrfTxInf)
-          ? pmtInf.CdtTrfTxInf
-          : [pmtInf?.CdtTrfTxInf];
-      
-        txs.forEach((tx, index) => {
-          const orgId = tx?.Cdtr?.Id?.OrgId?.Othr?.Id || "";
-          const instrId = tx?.PmtId?.InstrId || "";
-          const fullMsgId = msgId;
-          const msgIdTail = fullMsgId.slice(-8);
-          const iban = tx?.CdtrAcct?.Id?.IBAN || "";
-          const ibanTail = iban.slice(-5);
-      
-          const expected = `${orgId}${instrId}${msgIdTail}${ibanTail}`;
-          const actual = tx?.PmtId?.EndToEndId || "";
-      
-          const match = actual === expected;
-      
-          results["AlphaEndToEndIdCheck"].push({
-            Transaction: index + 1,
-            Expected: expected,
-            Actual: actual,
-            Validation: match ? "✅ MATCH" : "❌ MISMATCH"
-          });
-        });
-      }
+  if (validations.includes("AlphaEndToEndIdCheck")) {
+  results["AlphaEndToEndIdCheck"] = [];
+
+  const doc = jsonData.Document?.CstmrCdtTrfInitn;
+  if (!doc || !doc.PmtInf || !doc.GrpHdr) {
+    results["AlphaEndToEndIdCheck"].push({
+      Error: "Missing required XML structure (GrpHdr or PmtInf)"
+    });
+  } else {
+    const msgId = doc.GrpHdr.MsgId || "";
+    const pmtInf = Array.isArray(doc.PmtInf) ? doc.PmtInf[0] : doc.PmtInf;
+
+    const txs = Array.isArray(pmtInf.CdtTrfTxInf)
+      ? pmtInf.CdtTrfTxInf
+      : [pmtInf.CdtTrfTxInf];
+
+    txs.forEach((tx, index) => {
+      const orgId = tx?.Cdtr?.Id?.OrgId?.Othr?.Id || "";
+      const instrId = tx?.PmtId?.InstrId || "";
+      const msgIdTail = msgId.slice(-8);
+      const iban = tx?.CdtrAcct?.Id?.IBAN || "";
+      const ibanTail = iban.slice(-5);
+
+      const expected = `${orgId}${instrId}${msgIdTail}${ibanTail}`;
+      const actual = tx?.PmtId?.EndToEndId || "";
+
+      results["AlphaEndToEndIdCheck"].push({
+        Transaction: index + 1,
+        Expected: expected,
+        Actual: actual,
+        Validation: actual === expected ? "✅ MATCH" : "❌ MISMATCH"
+      });
+    });
+  }
+
       
     const fixedResults = Object.entries(expected).map(([field, passed]) => ({
       Field: field,

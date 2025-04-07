@@ -115,7 +115,6 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       "Dbtr ID": pmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id === "801567852",
       "PmtMtd": pmtInf?.PmtMtd === "TRF",
       "SvcLvl Code": pmtInf?.PmtTpInf?.SvcLvl?.Cd === "SEPA",
-      "CtgyPurp Code": pmtInf?.PmtTpInf?.CtgyPurp?.Cd === "EPAY",
       "IBAN": pmtInf?.DbtrAcct?.Id?.IBAN === "GR6001401010101002320023413",
       "InitgPty ID": init?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Id === "AMP203030",
       "InitgPty Issr": init?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Issr === "Alpha",

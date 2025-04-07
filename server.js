@@ -99,6 +99,33 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       Validation: isValid ? "✅ MATCH" : "❌ MISMATCH"
     });
   }
+
+  if (validations.includes("AlphaFixedValueCheck")) {
+    results["AlphaFixedValueCheck"] = [];
+  
+    const init = jsonData.Document?.CstmrCdtTrfInitn;
+    const pmtInf = Array.isArray(init?.PmtInf) ? init.PmtInf[0] : init?.PmtInf;
+  
+    const expected = {
+      "Dbtr Name": pmtInf?.Dbtr?.Nm === "EMSPI",
+      "Dbtr ID": pmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id === "801567852",
+      "PmtMtd": pmtInf?.PmtMtd === "TRF",
+      "SvcLvl Code": pmtInf?.PmtTpInf?.SvcLvl?.Cd === "SEPA",
+      "CtgyPurp Code": pmtInf?.PmtTpInf?.CtgyPurp?.Cd === "EPAY",
+      "IBAN": pmtInf?.DbtrAcct?.Id?.IBAN === "GR6001401010101002320023413",
+      "InitgPty ID": init?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Id === "AMP203030",
+      "InitgPty Issr": init?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Issr === "Alpha",
+      "ChrgBr": pmtInf?.ChrgBr === "SLEV",
+    };
+  
+    const fixedResults = Object.entries(expected).map(([field, passed]) => ({
+      Field: field,
+      Validation: passed ? "✅ OK" : "❌ MISMATCH"
+    }));
+  
+    results["AlphaFixedValueCheck"] = fixedResults;
+  }
+  
   
 
     res.json(results);

@@ -67,6 +67,40 @@ app.post("/validate", (req, res) => {
         });
     }
 
+    // Validation 2: AlphaCtrlSumCheck (GrpHdr CtrlSum === total of all InstdAmt)
+if (validations.includes("AlphaCtrlSumCheck")) {
+    results["AlphaCtrlSumCheck"] = [];
+  
+    const grpHdr = jsonData.Document?.CstmrCdtTrfInitn?.GrpHdr;
+    const payments = jsonData.Document?.CstmrCdtTrfInitn?.PmtInf;
+    const paymentArray = Array.isArray(payments) ? payments : [payments];
+  
+    let allTxs = [];
+  
+    // Collect all transactions across all PmtInf
+    paymentArray.forEach(payment => {
+      const txs = Array.isArray(payment.CdtTrfTxInf)
+        ? payment.CdtTrfTxInf
+        : [payment.CdtTrfTxInf];
+      allTxs = allTxs.concat(txs);
+    });
+  
+    const totalAmount = allTxs.reduce((sum, tx) => {
+      const amount = parseFloat(tx.Amt?.InstdAmt?._ || 0);
+      return sum + amount;
+    }, 0);
+  
+    const ctrlSum = parseFloat(grpHdr?.CtrlSum || 0);
+    const isValid = ctrlSum === totalAmount;
+  
+    results["AlphaCtrlSumCheck"].push({
+      CtrlSumFromGrpHdr: ctrlSum,
+      ComputedSumOfInstdAmt: totalAmount.toFixed(2),
+      Validation: isValid ? "✅ MATCH" : "❌ MISMATCH"
+    });
+  }
+  
+
     res.json(results);
 });
 

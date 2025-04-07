@@ -65,9 +65,9 @@ app.post("/validate", (req, res) => {
                 Validation: isValid ? "✅ MATCH" : "❌ MISMATCH"
             });
         });
-    }
+    
     res.json(results);
-});
+    }
 
 
     // Validation 2: AlphaCtrlSumCheck (GrpHdr CtrlSum === total of all InstdAmt)
@@ -161,7 +161,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         });
       }
       
-   
+    });
   
   
 

@@ -160,6 +160,25 @@ if (validations.includes("AlphaCtrlSumCheck")) {
           });
         });
       }
+
+      if (validations.includes("AlphaPaymentinfIdCheck")) {
+        results["AlphaPaymentinfIdCheck"] = [];
+      
+        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const msgId = doc?.GrpHdr?.MsgId || "";
+        const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
+      
+        const branchCode = "14162";
+        const merchantCode = "203030";
+        const expected = `AMP${branchCode}${merchantCode}${msgId.slice(-8)}`;
+        const actual = pmtInf?.PmtInfId || "";
+      
+        results["AlphaPaymentinfIdCheck"].push({
+          Expected: expected,
+          Actual: actual,
+          Validation: actual === expected ? "✅ MATCH" : "❌ MISMATCH"
+        });
+      }
       
       res.json(results); 
     });

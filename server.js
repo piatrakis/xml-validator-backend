@@ -179,6 +179,23 @@ if (validations.includes("AlphaCtrlSumCheck")) {
           Validation: actual === expected ? "✅ MATCH" : "❌ MISMATCH"
         });
       }
+
+      if (validations.includes("AlphaFilenameCheck")) {
+        results["AlphaFilenameCheck"] = [];
+      
+        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const msgId = doc?.GrpHdr?.MsgId || "";
+        const last8 = msgId.slice(-8);
+      
+        const expected = `AMP20303014162${last8}001_pain001.xml`;
+        const actual = req.body.filename || "";
+      
+        results["AlphaFilenameCheck"].push({
+          Expected: expected,
+          Actual: actual,
+          Validation: actual === expected ? "✅ MATCH" : "❌ MISMATCH"
+        });
+      }
       
       res.json(results); 
     });

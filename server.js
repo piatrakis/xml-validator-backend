@@ -187,7 +187,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         const msgId = doc?.GrpHdr?.MsgId || "";
         const last8 = msgId.slice(-8);
       
-        const expected = `AMP20303014162${last8}001_pain001.xml`;
+        const expected = `AMP20303014162${last8}001_pain001.XML`;
         const actual = req.body.filename || "";
       
         results["AlphaFilenameCheck"].push({

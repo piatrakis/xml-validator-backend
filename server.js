@@ -196,6 +196,32 @@ if (validations.includes("AlphaCtrlSumCheck")) {
           Validation: actual === expected ? "✅ MATCH" : "❌ MISMATCH"
         });
       }
+
+      if (validations.includes("AlphaCreationVsExecutionCheck")) {
+        results["AlphaCreationVsExecutionCheck"] = [];
+      
+        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const creDtTm = doc?.GrpHdr?.CreDtTm;
+        const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
+        const reqdExctnDt = pmtInf?.ReqdExctnDt;
+      
+        if (creDtTm && reqdExctnDt) {
+          const creationDate = new Date(creDtTm);
+          const executionDate = new Date(reqdExctnDt);
+      
+          const isValid = creationDate < executionDate;
+      
+          results["AlphaCreationVsExecutionCheck"].push({
+            CreDtTm: creDtTm,
+            ReqdExctnDt: reqdExctnDt,
+            Validation: isValid ? "✅ CreDtTm is earlier" : "❌ CreDtTm is NOT earlier"
+          });
+        } else {
+          results["AlphaCreationVsExecutionCheck"].push({
+            Error: "Missing CreDtTm or ReqdExctnDt in the XML"
+          });
+        }
+      }
       
       res.json(results); 
     });

@@ -128,10 +128,15 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       results["AlphaFixedValueCheck"] = fixedResults;
     }
     
+    function getRootDocument(json) {
+      const rootKey = Object.keys(json).find(key => key.endsWith(":Document") || key === "Document");
+      return json[rootKey] || {};
+    }
+
     if (validations.includes("AlphaEndToEndIdCheck")) {
         results["AlphaEndToEndIdCheck"] = [];
       
-        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
         const msgId = doc?.GrpHdr?.MsgId || "";
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
       
@@ -164,7 +169,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       if (validations.includes("AlphaPaymentinfIdCheck")) {
         results["AlphaPaymentinfIdCheck"] = [];
       
-        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
         const msgId = doc?.GrpHdr?.MsgId || "";
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
       
@@ -183,7 +188,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       if (validations.includes("AlphaFilenameCheck")) {
         results["AlphaFilenameCheck"] = [];
       
-        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
         const msgId = doc?.GrpHdr?.MsgId || "";
         const last8 = msgId.slice(-8);
       
@@ -200,7 +205,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       if (validations.includes("AlphaCreationVsExecutionCheck")) {
         results["AlphaCreationVsExecutionCheck"] = [];
       
-        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
         const creDtTm = doc?.GrpHdr?.CreDtTm;
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
         const reqdExctnDt = pmtInf?.ReqdExctnDt;
@@ -227,7 +232,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         console.log("Eurobank validation running...");
         results["EurobankNoOrgIdCheck"] = [];
       
-        const doc = jsonData.Document?.CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
 
         const initgPtyOrgId = doc?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Id;
@@ -268,7 +273,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         }
       }
       
-      console.log("Sending back results:", results);
+      
       res.json(results); 
     });
   

@@ -229,7 +229,8 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         const doc = jsonData.Document?.CstmrCdtTrfInitn;
       
         const initgPtyOrgId = doc?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Id;
-        const dbtrOrgId = doc?.PmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id;
+        const dbtrOrgId = pmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id;
+
       
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
         let txs = [];

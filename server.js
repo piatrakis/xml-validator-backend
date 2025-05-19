@@ -232,9 +232,12 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         const dbtrOrgId = doc?.PmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id;
       
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
-        const txs = Array.isArray(pmtInf?.CdtTrfTxInf)
-          ? pmtInf.CdtTrfTxInf
-          : [pmtInf?.CdtTrfTxInf];
+        let txs = [];
+        if (pmtInf?.CdtTrfTxInf) {
+          txs = Array.isArray(pmtInf.CdtTrfTxInf)
+            ? pmtInf.CdtTrfTxInf
+            : [pmtInf.CdtTrfTxInf];
+        }
       
         let cdtrOrgIdFound = false;
       

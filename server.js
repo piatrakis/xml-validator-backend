@@ -254,9 +254,8 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         if (dbtrOrgId) violations.push("Debtor Organization Id found");
         if (cdtrOrgIdFound) violations.push("Creditor Organization Id found");
       
-        results["EurobankNoOrgIdCheck"] = ["✅ This is working!"];
 
-       /* if (violations.length === 0) {
+        if (violations.length === 0) {
           results["EurobankNoOrgIdCheck"].push({
             Validation: "✅ No OrgId fields found"
           });
@@ -265,10 +264,10 @@ if (validations.includes("AlphaCtrlSumCheck")) {
             Validation: "❌ Forbidden OrgId fields present",
             Violations: violations
           });
-        }*/
+        }
       }
       
-      
+      console.log("Sending back results:", results);
       res.json(results); 
     });
   

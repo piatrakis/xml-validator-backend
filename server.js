@@ -74,6 +74,7 @@ app.post("/validate", (req, res) => {
     // Validation 2: AlphaCtrlSumCheck (GrpHdr CtrlSum === total of all InstdAmt)
 if (validations.includes("AlphaCtrlSumCheck")) {
     results["AlphaCtrlSumCheck"] = [];
+    console.log("Eurobank validation running...");
   
     const grpHdr = jsonData.Document?.CstmrCdtTrfInitn?.GrpHdr;
     const payments = jsonData.Document?.CstmrCdtTrfInitn?.PmtInf;

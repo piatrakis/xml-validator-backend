@@ -224,6 +224,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       }
 
       if (validations.includes("EurobankNoOrgIdCheck")) {
+        console.log("Eurobank validation running...");
         results["EurobankNoOrgIdCheck"] = [];
       
         const doc = jsonData.Document?.CstmrCdtTrfInitn;

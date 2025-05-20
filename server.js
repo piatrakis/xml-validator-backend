@@ -74,7 +74,7 @@ app.post("/validate", (req, res) => {
     // Validation 2: AlphaCtrlSumCheck (GrpHdr CtrlSum === total of all InstdAmt)
 if (validations.includes("AlphaCtrlSumCheck")) {
     results["AlphaCtrlSumCheck"] = [];
-    console.log("Eurobank validation running...");
+    
   
     const grpHdr = jsonData.Document?.CstmrCdtTrfInitn?.GrpHdr;
     const payments = jsonData.Document?.CstmrCdtTrfInitn?.PmtInf;
@@ -230,7 +230,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       }
 
       if (validations.includes("EurobankNoOrgIdCheck")) {
-        console.log("Eurobank validation running...");
+      
         results["EurobankNoOrgIdCheck"] = [];
       
         const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
@@ -273,6 +273,34 @@ if (validations.includes("AlphaCtrlSumCheck")) {
           });
         }
       }
+
+      if (validations.includes("EurobankEndToEndIdCheck")) {
+  results["EurobankEndToEndIdCheck"] = [];
+
+  const doc = getRootDocument(jsonData);
+  const msgId = doc?.GrpHdr?.MsgId || "";
+  const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
+
+  const debtorOrgId = pmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id || "";
+  const txs = Array.isArray(pmtInf?.CdtTrfTxInf) ? pmtInf.CdtTrfTxInf : [pmtInf?.CdtTrfTxInf];
+
+  txs.forEach((tx, idx) => {
+    const instrId = tx?.PmtId?.InstrId || "";
+    const endToEndId = tx?.PmtId?.EndToEndId || "";
+    const iban = tx?.CdtrAcct?.Id?.IBAN || "";
+
+    const expected =
+      debtorOrgId + instrId + msgId.slice(-8) + iban.slice(-5);
+
+    results["EurobankEndToEndIdCheck"].push({
+      Transaction: idx + 1,
+      Expected: expected,
+      Actual: endToEndId,
+      Validation: endToEndId === expected ? "✅ MATCH" : "❌ MISMATCH"
+    });
+  });
+}
+
       
       
       res.json(results); 

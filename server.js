@@ -305,6 +305,31 @@ if (validations.includes("AlphaCtrlSumCheck")) {
   });
 }
 
+if (validations.includes("EurobankRequiredFieldsCheck")) {
+  results["EurobankRequiredFieldsCheck"] = [];
+
+  const doc = getRootDocument(jsonData);
+  const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
+  const txs = Array.isArray(pmtInf?.CdtTrfTxInf) ? pmtInf.CdtTrfTxInf : [pmtInf?.CdtTrfTxInf];
+
+  txs.forEach((tx, idx) => {
+    const missing = [];
+
+    if (!tx?.Amt) missing.push("Amt");
+    if (!tx?.Amt?.InstdAmt) missing.push("InstdAmt");
+    const ustrd = tx?.RmtInf?.Ustrd;
+    const hasUstrd = Array.isArray(ustrd) ? ustrd.length > 0 : !!ustrd;
+    if (!hasUstrd) missing.push("Ustrd");
+
+    results["EurobankRequiredFieldsCheck"].push({
+      Transaction: idx + 1,
+      MissingFields: missing.length ? missing : "✅ All Required Fields Present",
+      Validation: missing.length === 0 ? "✅ PASS" : "❌ FAIL"
+    });
+  });
+}
+
+
       
       
       res.json(results); 

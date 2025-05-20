@@ -141,7 +141,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
     if (validations.includes("AlphaEndToEndIdCheck")) {
         results["AlphaEndToEndIdCheck"] = [];
       
-        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData);
         const msgId = doc?.GrpHdr?.MsgId || "";
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
       
@@ -174,7 +174,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       if (validations.includes("AlphaPaymentinfIdCheck")) {
         results["AlphaPaymentinfIdCheck"] = [];
       
-        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData);
         const msgId = doc?.GrpHdr?.MsgId || "";
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
       
@@ -193,7 +193,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       if (validations.includes("AlphaFilenameCheck")) {
         results["AlphaFilenameCheck"] = [];
       
-        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData);
         const msgId = doc?.GrpHdr?.MsgId || "";
         const last8 = msgId.slice(-8);
       
@@ -210,7 +210,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       if (validations.includes("AlphaCreationVsExecutionCheck")) {
         results["AlphaCreationVsExecutionCheck"] = [];
       
-        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData);
         const creDtTm = doc?.GrpHdr?.CreDtTm;
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
         const reqdExctnDt = pmtInf?.ReqdExctnDt;
@@ -237,7 +237,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       
         results["EurobankNoOrgIdCheck"] = [];
       
-        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData);
         const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
 
         const initgPtyOrgId = doc?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Id;
@@ -281,17 +281,33 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       if (validations.includes("EurobankEndToEndIdCheck")) {
   results["EurobankEndToEndIdCheck"] = [];
       
-        const doc = getRootDocument(jsonData).CstmrCdtTrfInitn;
+        const doc = getRootDocument(jsonData);
         const msgId = doc?.GrpHdr?.MsgId || "";
-        const last8 = msgId.slice(-8);
+        const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
       
-        const expected = `AMP20303014162${last8}001_pain001.XML`;
-        const actual = req.body.filename || "";
+        const txs = Array.isArray(pmtInf?.CdtTrfTxInf)
+          ? pmtInf.CdtTrfTxInf
+          : [pmtInf?.CdtTrfTxInf];
       
-        results["EurobankEndToEndIdCheck"].push({
-          Expected: expected,
-          Actual: actual,
-          Validation: actual === expected ? "✅ MATCH" : "❌ MISMATCH"
+        txs.forEach((tx, index) => {
+          const orgId = tx?.Cdtr?.Id?.OrgId?.Othr?.Id || "";
+          const instrId = tx?.PmtId?.InstrId || "";
+          const fullMsgId = msgId;
+          const msgIdTail = fullMsgId.slice(-8);
+          const iban = tx?.CdtrAcct?.Id?.IBAN || "";
+          const ibanTail = iban.slice(-5);
+      
+          const expected = `${orgId}${instrId}${msgIdTail}${ibanTail}`;
+          const actual = tx?.PmtId?.EndToEndId || "";
+      
+          const match = actual === expected;
+      
+          results["EurobankEndToEndIdCheck"].push({
+            Transaction: index + 1,
+            Expected: expected,
+            Actual: actual,
+            Validation: match ? "✅ MATCH" : "❌ MISMATCH"
+          });
         });
 }
 

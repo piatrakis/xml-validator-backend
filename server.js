@@ -129,10 +129,14 @@ if (validations.includes("AlphaCtrlSumCheck")) {
       results["AlphaFixedValueCheck"] = fixedResults;
     }
     
-    function getRootDocument(json) {
-      const rootKey = Object.keys(json).find(key => key.endsWith(":Document") || key === "Document");
-      return json[rootKey] || {};
-    }
+   function getRootDocument(json) {
+  const docKey = Object.keys(json).find(k => k.endsWith(":Document") || k === "Document");
+  const document = json[docKey] || {};
+
+  const initKey = Object.keys(document).find(k => k.endsWith(":CstmrCdtTrfInitn") || k === "CstmrCdtTrfInitn");
+  return document[initKey] || {};
+}
+
 
     if (validations.includes("AlphaEndToEndIdCheck")) {
         results["AlphaEndToEndIdCheck"] = [];

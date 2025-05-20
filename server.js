@@ -137,6 +137,51 @@ if (validations.includes("AlphaCtrlSumCheck")) {
   return document[initKey] || {};
 }
 
+if (validations.includes("EurobankNoOrgIdCheck")) {
+      
+        results["EurobankNoOrgIdCheck"] = [];
+      
+        const doc = getRootDocument(jsonData);
+        const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
+
+        const initgPtyOrgId = doc?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Id;
+        const dbtrOrgId = pmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id;
+
+      
+        
+        let txs = [];
+        if (pmtInf?.CdtTrfTxInf) {
+          txs = Array.isArray(pmtInf.CdtTrfTxInf)
+            ? pmtInf.CdtTrfTxInf
+            : [pmtInf.CdtTrfTxInf];
+        }
+      
+        let cdtrOrgIdFound = false;
+      
+        txs.forEach((tx) => {
+          const cdtrOrgId = tx?.Cdtr?.Id?.OrgId?.Othr?.Id;
+          if (cdtrOrgId) cdtrOrgIdFound = true;
+        });
+      
+        const violations = [];
+      
+        if (initgPtyOrgId) violations.push("InitgPty Organization Id found");
+        if (dbtrOrgId) violations.push("Debtor Organization Id found");
+        if (cdtrOrgIdFound) violations.push("Creditor Organization Id found");
+      
+
+        if (violations.length === 0) {
+          results["EurobankNoOrgIdCheck"].push({
+            Validation: "✅ No OrgId fields found"
+          });
+        } else {
+          results["EurobankNoOrgIdCheck"].push({
+            Validation: "❌ Forbidden OrgId fields present",
+            Violations: violations
+          });
+        }
+      }
+
 
     if (validations.includes("AlphaEndToEndIdCheck")) {
         results["AlphaEndToEndIdCheck"] = [];
@@ -233,50 +278,7 @@ if (validations.includes("AlphaCtrlSumCheck")) {
         }
       }
 
-      if (validations.includes("EurobankNoOrgIdCheck")) {
       
-        results["EurobankNoOrgIdCheck"] = [];
-      
-        const doc = getRootDocument(jsonData);
-        const pmtInf = Array.isArray(doc?.PmtInf) ? doc.PmtInf[0] : doc?.PmtInf;
-
-        const initgPtyOrgId = doc?.GrpHdr?.InitgPty?.Id?.OrgId?.Othr?.Id;
-        const dbtrOrgId = pmtInf?.Dbtr?.Id?.OrgId?.Othr?.Id;
-
-      
-        
-        let txs = [];
-        if (pmtInf?.CdtTrfTxInf) {
-          txs = Array.isArray(pmtInf.CdtTrfTxInf)
-            ? pmtInf.CdtTrfTxInf
-            : [pmtInf.CdtTrfTxInf];
-        }
-      
-        let cdtrOrgIdFound = false;
-      
-        txs.forEach((tx) => {
-          const cdtrOrgId = tx?.Cdtr?.Id?.OrgId?.Othr?.Id;
-          if (cdtrOrgId) cdtrOrgIdFound = true;
-        });
-      
-        const violations = [];
-      
-        if (initgPtyOrgId) violations.push("InitgPty Organization Id found");
-        if (dbtrOrgId) violations.push("Debtor Organization Id found");
-        if (cdtrOrgIdFound) violations.push("Creditor Organization Id found");
-      
-
-        if (violations.length === 0) {
-          results["EurobankNoOrgIdCheck"].push({
-            Validation: "✅ No OrgId fields found"
-          });
-        } else {
-          results["EurobankNoOrgIdCheck"].push({
-            Validation: "❌ Forbidden OrgId fields present",
-            Violations: violations
-          });
-        }
-      }
 
       if (validations.includes("EurobankEndToEndIdCheck")) {
   results["EurobankEndToEndIdCheck"] = [];

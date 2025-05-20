@@ -23,7 +23,12 @@ app.post("/upload", upload.single("file"), (req, res) => {
     const xmlData = req.file.buffer.toString();
 
     // Parse XML to JSON
-    const parser = new xml2js.Parser({ explicitArray: false, mergeAttrs: true });
+    const parser = new xml2js.Parser({
+  explicitArray: false,
+  mergeAttrs: true,
+  tagNameProcessors: [xml2js.processors.stripPrefix]
+});
+
 
     parser.parseString(xmlData, (err, result) => {
         if (err) {

@@ -334,6 +334,39 @@ if (validations.includes("EurobankRequiredFieldsCheck")) {
   });
 }
 
+if (validations.includes("EurobankCtrlSumCheck")) {
+  results["EurobankCtrlSumCheck"] = [];
+
+  const doc = getRootDocument(jsonData);
+  const grpHdr = doc?.GrpHdr;
+  const pmtInfs = Array.isArray(doc?.PmtInf) ? doc.PmtInf : [doc?.PmtInf];
+
+  let allTxs = [];
+
+  // Collect all transactions from all PmtInf blocks
+  pmtInfs.forEach(payment => {
+    const txs = Array.isArray(payment?.CdtTrfTxInf)
+      ? payment.CdtTrfTxInf
+      : [payment?.CdtTrfTxInf];
+    allTxs = allTxs.concat(txs);
+  });
+
+  const totalAmount = allTxs.reduce((sum, tx) => {
+    const amount = parseFloat(tx?.Amt?.InstdAmt?._ || tx?.Amt?.InstdAmt || 0);
+    return sum + amount;
+  }, 0);
+
+  const ctrlSum = parseFloat(grpHdr?.CtrlSum || 0);
+  const isValid = ctrlSum === totalAmount;
+
+  results["EurobankCtrlSumCheck"].push({
+    CtrlSumFromGrpHdr: ctrlSum,
+    ComputedSumOfInstdAmt: totalAmount.toFixed(2),
+    Validation: isValid ? "✅ MATCH" : "❌ MISMATCH"
+  });
+}
+
+
 
       
       

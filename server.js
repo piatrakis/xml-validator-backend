@@ -366,6 +366,46 @@ if (validations.includes("EurobankCtrlSumCheck")) {
   });
 }
 
+if (validations.includes("EurobankFixedValueCheck")) {
+  results["EurobankFixedValueCheck"] = [];
+
+  const doc = getRootDocument(jsonData);
+  const initgPtyName = doc?.GrpHdr?.InitgPty?.Nm || "";
+  const pmtInfs = Array.isArray(doc?.PmtInf) ? doc.PmtInf : [doc?.PmtInf];
+
+  pmtInfs.forEach((pmtInf, index) => {
+    const result = {
+      PmtInfBlock: index + 1,
+      Validation: "✅ PASS",
+      Failures: []
+    };
+
+    const checks = [
+      { label: "InitgPty.Nm", actual: initgPtyName, expected: "EMSPI" },
+      { label: "PmtMtd", actual: pmtInf?.PmtMtd, expected: "TRF" },
+      { label: "SvcLvl.Cd", actual: pmtInf?.PmtTpInf?.SvcLvl?.Cd, expected: "NURG" },
+      { label: "DbtrAcct.IBAN", actual: pmtInf?.DbtrAcct?.Id?.IBAN, expected: "GR5902600100000480201470870" },
+      { label: "DbtrAgt.FinInstnId", actual: pmtInf?.DbtrAgt?.FinInstnId?.BIC || pmtInf?.DbtrAgt?.FinInstnId, expected: "ERBKGRAA" },
+      { label: "ChrgBr", actual: pmtInf?.ChrgBr, expected: "SHAR" }
+    ];
+
+    checks.forEach(({ label, actual, expected }) => {
+      if (actual !== expected) {
+        result.Failures.push({
+          Field: label,
+          Expected: expected,
+          Actual: actual || "[missing]"
+        });
+      }
+    });
+
+    if (result.Failures.length > 0) {
+      result.Validation = "❌ FAIL";
+    }
+
+    results["EurobankFixedValueCheck"].push(result);
+  });
+}
 
 
       

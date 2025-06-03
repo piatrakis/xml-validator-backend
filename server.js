@@ -374,38 +374,45 @@ if (validations.includes("EurobankFixedValueCheck")) {
   const pmtInfs = Array.isArray(doc?.PmtInf) ? doc.PmtInf : [doc?.PmtInf];
 
   pmtInfs.forEach((pmtInf, index) => {
-    const checks = [
-      {
-        Field: "InitgPty.Nm",
-        Expected: "EMSPI",
-        Actual: initgPtyName
-      },
-      {
-        Field: "PmtMtd",
-        Expected: "TRF",
-        Actual: pmtInf?.PmtMtd
-      },
-      {
-        Field: "SvcLvl.Cd",
-        Expected: "NURG",
-        Actual: pmtInf?.PmtTpInf?.SvcLvl?.Cd
-      },
-      {
-        Field: "DbtrAcct.IBAN",
-        Expected: "GR5902600100000480201470870",
-        Actual: pmtInf?.DbtrAcct?.Id?.IBAN
-      },
-      {
-        Field: "DbtrAgt.FinInstnId",
-        Expected: "ERBKGRAA",
-        Actual: pmtInf?.DbtrAgt?.FinInstnId?.BIC || pmtInf?.DbtrAgt?.FinInstnId
-      },
-      {
-        Field: "ChrgBr",
-        Expected: "SHAR",
-        Actual: pmtInf?.ChrgBr
-      }
-    ];
+   const checks = [
+  {
+    Field: "Initiating Party Name",
+    Path: "InitgPty.Nm",
+    Expected: "EMSPI",
+    Actual: initgPtyName
+  },
+  {
+    Field: "Payment Method",
+    Path: "PmtMtd",
+    Expected: "TRF",
+    Actual: pmtInf?.PmtMtd
+  },
+  {
+    Field: "Service Level Code",
+    Path: "SvcLvl.Cd",
+    Expected: "NURG",
+    Actual: pmtInf?.PmtTpInf?.SvcLvl?.Cd
+  },
+  {
+    Field: "Debtor Account IBAN",
+    Path: "DbtrAcct.IBAN",
+    Expected: "GR5902600100000480201470870",
+    Actual: pmtInf?.DbtrAcct?.Id?.IBAN
+  },
+  {
+    Field: "Financial Institution Identification",
+    Path: "DbtrAgt.FinInstnId",
+    Expected: "ERBKGRAA",
+    Actual: pmtInf?.DbtrAgt?.FinInstnId?.BIC || pmtInf?.DbtrAgt?.FinInstnId
+  },
+  {
+    Field: "Charge Bearer",
+    Path: "ChrgBr",
+    Expected: "SHAR",
+    Actual: pmtInf?.ChrgBr
+  }
+];
+
 
     const detailedResults = checks.map(({ Field, Expected, Actual }) => ({
       Field,

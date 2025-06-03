@@ -374,36 +374,50 @@ if (validations.includes("EurobankFixedValueCheck")) {
   const pmtInfs = Array.isArray(doc?.PmtInf) ? doc.PmtInf : [doc?.PmtInf];
 
   pmtInfs.forEach((pmtInf, index) => {
-    const result = {
-      PmtInfBlock: index + 1,
-      Validation: "✅ PASS",
-      Failures: []
-    };
-
     const checks = [
-      { label: "InitgPty.Nm", actual: initgPtyName, expected: "EMSPI" },
-      { label: "PmtMtd", actual: pmtInf?.PmtMtd, expected: "TRF" },
-      { label: "SvcLvl.Cd", actual: pmtInf?.PmtTpInf?.SvcLvl?.Cd, expected: "NURG" },
-      { label: "DbtrAcct.IBAN", actual: pmtInf?.DbtrAcct?.Id?.IBAN, expected: "GR5902600100000480201470870" },
-      { label: "DbtrAgt.FinInstnId", actual: pmtInf?.DbtrAgt?.FinInstnId?.BIC || pmtInf?.DbtrAgt?.FinInstnId, expected: "ERBKGRAA" },
-      { label: "ChrgBr", actual: pmtInf?.ChrgBr, expected: "SHAR" }
+      {
+        Field: "InitgPty.Nm",
+        Expected: "EMSPI",
+        Actual: initgPtyName
+      },
+      {
+        Field: "PmtMtd",
+        Expected: "TRF",
+        Actual: pmtInf?.PmtMtd
+      },
+      {
+        Field: "SvcLvl.Cd",
+        Expected: "NURG",
+        Actual: pmtInf?.PmtTpInf?.SvcLvl?.Cd
+      },
+      {
+        Field: "DbtrAcct.IBAN",
+        Expected: "GR5902600100000480201470870",
+        Actual: pmtInf?.DbtrAcct?.Id?.IBAN
+      },
+      {
+        Field: "DbtrAgt.FinInstnId",
+        Expected: "ERBKGRAA",
+        Actual: pmtInf?.DbtrAgt?.FinInstnId?.BIC || pmtInf?.DbtrAgt?.FinInstnId
+      },
+      {
+        Field: "ChrgBr",
+        Expected: "SHAR",
+        Actual: pmtInf?.ChrgBr
+      }
     ];
 
-    checks.forEach(({ label, actual, expected }) => {
-      if (actual !== expected) {
-        result.Failures.push({
-          Field: label,
-          Expected: expected,
-          Actual: actual || "[missing]"
-        });
-      }
+    const detailedResults = checks.map(({ Field, Expected, Actual }) => ({
+      Field,
+      Expected,
+      Actual: Actual || "[missing]",
+      Validation: Expected === Actual ? "✅ PASS" : "❌ FAIL"
+    }));
+
+    results["EurobankFixedValueCheck"].push({
+      PmtInfBlock: index + 1,
+      Fields: detailedResults
     });
-
-    if (result.Failures.length > 0) {
-      result.Validation = "❌ FAIL";
-    }
-
-    results["EurobankFixedValueCheck"].push(result);
   });
 }
 

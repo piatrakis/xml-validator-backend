@@ -460,6 +460,72 @@ if (validations.includes("NBGCtrlSumCheck")) {
   });
 }
 
+if (validations.includes("NBGFixedValueCheck")) {
+  results["NBGFixedValueCheck"] = [];
+
+  const doc = getRootDocument(jsonData);
+  const initgPtyName = doc?.GrpHdr?.InitgPty?.Nm || "";
+  const pmtInfs = Array.isArray(doc?.PmtInf) ? doc.PmtInf : [doc?.PmtInf];
+
+  pmtInfs.forEach((pmtInf, index) => {
+    const checks = [
+      {
+        Field: "Initiating Party Name",
+        Expected: "EMSPI",
+        Actual: initgPtyName
+      },
+      {
+        Field: "Payment Method",
+        Expected: "TRF",
+        Actual: pmtInf?.PmtMtd
+      },
+      {
+        Field: "Service Level Code",
+        Expected: "NURG",
+        Actual: pmtInf?.PmtTpInf?.SvcLvl?.Cd
+      },
+      {
+        Field: "Local Instrument",
+        Expected: "ECR",
+        Actual: pmtInf?.PmtTpInf?.LclInstrm?.Prtry
+      },
+      {
+        Field: "Category Purpose Code",
+        Expected: "BENE",
+        Actual: pmtInf?.PmtTpInf?.CtgyPurp?.Cd
+      },
+      {
+        Field: "Debtor Agent BIC",
+        Expected: "ERBKGRAA",
+        Actual: pmtInf?.DbtrAgt?.FinInstnId?.BIC || pmtInf?.DbtrAgt?.FinInstnId
+      },
+      {
+        Field: "Charge Bearer",
+        Expected: "SLEV",
+        Actual: pmtInf?.ChrgBr
+      },
+      {
+        Field: "Creditor Agent BIC",
+        Expected: "ETHNGRAA",
+        Actual: pmtInf?.CdtrAgt?.FinInstnId?.BIC || pmtInf?.CdtrAgt?.FinInstnId
+      }
+    ];
+
+    const detailedResults = checks.map(({ Field, Expected, Actual }) => ({
+      Field,
+      Expected,
+      Actual: Actual || "[missing]",
+      Validation: Expected === Actual ? "✅ PASS" : "❌ FAIL"
+    }));
+
+    results["NBGFixedValueCheck"].push({
+      PmtInfBlock: index + 1,
+      Fields: detailedResults
+    });
+  });
+}
+
+
       
       
       res.json(results); 
